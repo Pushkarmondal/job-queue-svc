@@ -21,7 +21,9 @@ async function run() {
         job
       )
 
-      await redis.zrem("retry_jobs", job)
+      // await redis.zrem("retry_jobs", job)
+      const parsed = JSON.parse(job)
+      console.log("Retrying job:", parsed.id)
     }
 
     await new Promise(r => setTimeout(r, 5000))

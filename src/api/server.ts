@@ -1,6 +1,7 @@
 import express from "express";
 import { v4 as uuid } from "uuid";
 import { redis } from "../redis/redisConnection";
+import { getMetrics } from "./metrics";
 
 const app = express();
 const PORT = 3004;
@@ -25,6 +26,11 @@ app.post("/jobs", async (req, res) => {
   )
   res.json({jobId: job.id})
 });
+
+app.get("/metrics", async (req, res) => {
+  const metrics = await getMetrics()
+  res.json(metrics)
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

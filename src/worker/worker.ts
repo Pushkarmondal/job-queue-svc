@@ -1,4 +1,5 @@
 import { redis } from "../redis/redisConnection";
+import { acquireJobExecution } from "../utils/idempotency";
 
 const STREAM = "jobs";
 const DLQ_STREAM = "jobs.dlq"
@@ -13,6 +14,13 @@ async function processJob(job: any) {
   if(Math.random() < 0.3) {
     throw new Error("Random failure");
   }
+  const allowed = await acquireJobExecution(job.id)
+  
+    if (!allowed) {
+      console.log("Duplicate job skipped:", job.id)
+      return
+    }
+
   
   await new Promise((r) => setTimeout(r, 2000));
   console.log("Finished processing job: ", job.id);
